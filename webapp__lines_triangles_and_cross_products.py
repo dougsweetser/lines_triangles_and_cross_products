@@ -1,5 +1,5 @@
 import streamlit as sl
-from Qs import *
+from Qs import add, cross_q, dif, Qs, product, rotation_angle, norm_squared
 import plotly.graph_objects as go
 
 # Sidebar setup.
