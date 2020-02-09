@@ -1,6 +1,7 @@
 import streamlit as sl
-from Qs import add, cross_q, dif, Qs, product, rotation_angle, norm_squared
 import plotly.graph_objects as go
+
+from Qs import add, cross_q, dif, Qs, product, rotation_angle, norm_squared
 
 # Sidebar setup.
 x_1 = sl.sidebar.slider(label="P1_x", min_value=-2.0, max_value=2.0, value=1.0)
