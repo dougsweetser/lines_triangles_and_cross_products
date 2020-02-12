@@ -1,0 +1,1130 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Developing Quaternions for iPython
+import math
+from copy import deepcopy
+import pytest
+import sympy as sp
+from Qs import *
+
+Q1: Q = Q([1, -2, -3, -4], q_type="Q")
+P: Q = Q([0, 4, -3, 0], q_type="P")
+R: Q = Q([3, 0, 0, 0], q_type="R")
+C: Q = Q([2, 4, 0, 0], q_type="C")
+t, x, y, z = sp.symbols("t x y z")
+q_sym: Q = Q([t, x, y, x * y * z])
+q22: Q = Q([2, 2, 0, 0])
+q44: Q = Q([4, 4, 0, 0])
+q4321: Q = Q([4, 3, 2, 1])
+q1324: Q = Q([1, 3, 2, 4])
+q2244: Q = Q([2, 2, 4, 4])
+
+q_0 = q0()
+q_1 = q1()
+q_i = qi()
+q_n1 = Q([-1, 0, 0, 0])
+q_2 = Q([2, 0, 0, 0])
+q_n2 = Q([-2, 0, 0, 0])
+q_3 = Q([3, 0, 0, 0])
+q_n3 = Q([-3, 0, 0, 0])
+q_4 = Q([4, 0, 0, 0])
+q_5 = Q([5, 0, 0, 0])
+q_6 = Q([6, 0, 0, 0])
+q_10 = Q([10, 0, 0, 0])
+q_n5 = Q([-5, 0, 0, 0])
+q_7 = Q([7, 0, 0, 0])
+q_8 = Q([8, 0, 0, 0])
+q_9 = Q([9, 0, 0, 0])
+q_n11 = Q([-11, 0, 0, 0])
+q_21 = Q([21, 0, 0, 0])
+q_n34 = Q([-34, 0, 0, 0])
+v3: Qs = Qs([q_3])
+v1123: Qs = Qs([q_1, q_1, q_2, q_3])
+v3n1n21: Qs = Qs([q_3, q_n1, q_n2, q_1])
+v9: Qs = Qs([q_1, q_1, q_2, q_3, q_1, q_1, q_2, q_3, q_2])
+v9i: Qs = Qs(
+    [
+        Q([0, 1, 0, 0]),
+        Q([0, 2, 0, 0]),
+        Q([0, 3, 0, 0]),
+        Q([0, 4, 0, 0]),
+        Q([0, 5, 0, 0]),
+        Q([0, 6, 0, 0]),
+        Q([0, 7, 0, 0]),
+        Q([0, 8, 0, 0]),
+        Q([0, 9, 0, 0]),
+    ]
+)
+vv9 = v9.add(v9i)
+q_1d0 = Q([1.0, 0, 0, 0])
+q12: Qs = Qs([q_1d0, q_1d0])
+q14: Qs = Qs([q_1d0, q_1d0, q_1d0, q_1d0])
+q19: Qs = Qs([q_1d0, q_0, q_1d0, q_1d0, q_1d0, q_1d0, q_1d0, q_1d0, q_1d0])
+qn627 = Q([-6, 27, 0, 0])
+v33 = Qs([q_7, q_0, q_n3, q_2, q_3, q_4, q_1, q_n1, q_n2])
+v33inv: Qs = Qs([q_n2, q_3, q_9, q_8, q_n11, q_n34, q_n5, q_7, q_21])
+q_i3: Qs = Qs([q_1, q_1, q_1])
+q_i2d: Qs = Qs([q_1, q_0, q_0, q_1])
+q_i3_bra = Qs([q_1, q_1, q_1], "bra")
+q_6_op: Qs = Qs([q_1, q_0, q_0, q_1, q_i, q_i], "op")
+q_6_op_32: Qs = Qs([q_1, q_0, q_0, q_1, q_i, q_i], "op", rows=3, columns=2)
+q_i2d_op: Qs = Qs([q_1, q_0, q_0, q_1], "op")
+q_i4 = Q([0, 4, 0, 0])
+q_0_q_1: Qs = Qs([q_0, q_1])
+q_1_q_0: Qs = Qs([q_1, q_0])
+q_1_q_i: Qs = Qs([q_1, q_i])
+q_0_q_i: Qs = Qs([q_0, q_i])
+A: Qs = Qs([Q([4, 0, 0, 0]), Q([0, 1, 0, 0])], "bra")
+B: Qs = Qs([Q([0, 0, 1, 0]), Q([0, 0, 0, 2]), Q([0, 3, 0, 0])])
+Op: Qs = Qs(
+    [
+        Q([3, 0, 0, 0]),
+        Q([0, 1, 0, 0]),
+        Q([0, 0, 2, 0]),
+        Q([0, 0, 0, 3]),
+        Q([2, 0, 0, 0]),
+        Q([0, 4, 0, 0]),
+    ],
+    "op",
+    rows=2,
+    columns=3,
+)
+Op4i = Qs([q_i4, q_0, q_0, q_i4, q_2, q_3], "op", rows=2, columns=3)
+Op_scalar = Qs([q_i4], "scalar")
+q_1234 = Qs(
+    [Q([1, 1, 0, 0]), Q([2, 1, 0, 0]), Q([3, 1, 0, 0]), Q([4, 1, 0, 0])]
+)
+sigma_y = Qs(
+    [Q([1, 0, 0, 0]), Q([0, -1, 0, 0]), Q([0, 1, 0, 0]), Q([-1, 0, 0, 0])]
+)
+qn = Qs([Q([3, 0, 0, 4])])
+# TODO test exception like so: q_bad = Qs([q_1], rows=2, columns=3)
+
+b = Qs([q_1, q_2, q_3], qs_type="bra")
+k = Qs([q_4, q_5, q_6], qs_type="ket")
+o = Qs([q_10], qs_type="op")
+
+Q_states = Qs([Q1])
+P_states = Qs([P])
+t, x, y, z = sp.symbols("t x y z")
+qs_22 = Qs([Q([2, 2, 0, 0])])
+qs_44 = Qs([Q([4, 4, 0, 0])])
+
+q1234 = Q([1, 2, 3, 4])
+q2222 = Q([2, 2, 2, 2])
+qsmall = Q([0.04, 0.2, 0.1, -0.3])
+q2_states = Qs([q1234, qsmall], "ket")
+qs_1234 = Qs([q1324, q1234])
+qs_1324 = Qs([q1324, q1324])
+
+
+def test__1000_qt():
+    assert Q1.t == 1
+
+
+def test__1010_subs():
+    q_z = q_sym.subs({t: 1, x: 2, y: 3, z: 4})
+    print("t x y xyz sub 1 2 3 4: ", q_z)
+    assert equals(q_z, Q([1, 2, 3, 24]))
+
+
+def test__1020_scalar():
+    q_z = scalar_q(Q1)
+    print("scalar(q): ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == 0
+    assert q_z.y == 0
+    assert q_z.z == 0
+
+
+def test__1030_vector():
+    q_z = vector_q(Q1)
+    print("vector(q): ", q_z)
+    assert q_z.t == 0
+    assert q_z.x == -2
+    assert q_z.y == -3
+    assert q_z.z == -4
+
+
+def test__1040_xyz():
+    q_z = xyz(Q1)
+    print("q.xyz()): ", q_z)
+    assert q_z[0] == -2
+    assert q_z[1] == -3
+    assert q_z[2] == -4
+
+
+def test__1050_q0():
+    q_z = q0()
+    print("q_0: ", q_z)
+    assert q_z.t == 0
+    assert q_z.x == 0
+    assert q_z.y == 0
+    assert q_z.z == 0
+
+
+def test__1060_q1():
+    q_z: Q = q1()
+    print("q_1: ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == 0
+    assert q_z.y == 0
+    assert q_z.z == 0
+
+
+def test__1070_qi():
+    q_z = qi()
+    print("qi: ", q_z)
+    assert q_z.t == 0
+    assert q_z.x == 1
+    assert q_z.y == 0
+    assert q_z.z == 0
+
+
+def test__1080_q_j():
+    q_z = qj()
+    print("q_j: ", q_z)
+    assert q_z.t == 0
+    assert q_z.x == 0
+    assert q_z.y == 1
+    assert q_z.z == 0
+
+
+def test__1090_qk():
+    q_z = qk()
+    print("q_k: ", q_z)
+    assert q_z.t == 0
+    assert q_z.x == 0
+    assert q_z.y == 0
+    assert q_z.z == 1
+
+
+def test__1100_qrandom():
+    q_z = qrandom()
+    print("q_random():", q_z)
+    assert -1 <= q_z.t <= 1
+    assert -1 <= q_z.x <= 1
+    assert -1 <= q_z.y <= 1
+    assert -1 <= q_z.z <= 1
+
+
+def test__1200_equals():
+    assert equals(Q1, Q1)
+    assert not equals(Q1, P)
+    assert equals(C, q44, scalar=False)
+    assert equals(q44, q4321, vector=False)
+
+
+def test__1210_conj_0():
+    q_z = conj(Q1)
+    print("q_conj 0: ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == 2
+    assert q_z.y == 3
+    assert q_z.z == 4
+
+
+def test__1220_conj_1():
+    q_z = conj(Q1, 1)
+    print("q_conj 1: ", q_z)
+    assert q_z.t == -1
+    assert q_z.x == -2
+    assert q_z.y == 3
+    assert q_z.z == 4
+
+
+def test__1230_conj_2():
+    q_z = conj(Q1, 2)
+    print("q_conj 2: ", q_z)
+    assert q_z.t == -1
+    assert q_z.x == 2
+    assert q_z.y == -3
+    assert q_z.z == 4
+
+
+def test__1240_conj_q():
+    q_z = conj_q(Q1, Q1)
+    print("conj_q(conj_q): ", q_z)
+    assert q_z.t == -1
+    assert q_z.x == 2
+    assert q_z.y == 3
+    assert q_z.z == -4
+
+
+def test_sign_1250_flips():
+    q_z = flip_signs(Q1)
+    print("sign_flips: ", q_z)
+    assert q_z.t == -1
+    assert q_z.x == 2
+    assert q_z.y == 3
+    assert q_z.z == 4
+
+
+def test__1260_vahlen_conj_minus():
+    q_z = vahlen_conj(Q1)
+    print("q_vahlen_conj -: ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == 2
+    assert q_z.y == 3
+    assert q_z.z == 4
+
+
+def test__1270_vahlen_conj_star():
+    q_z = vahlen_conj(Q1, "*")
+    print("q_vahlen_conj *: ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == -2
+    assert q_z.y == -3
+    assert q_z.z == 4
+
+
+def test__1280_vahlen_conj_prime():
+    q_z = vahlen_conj(Q1, "'")
+    print("q_vahlen_conj ': ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == 2
+    assert q_z.y == 3
+    assert q_z.z == -4
+
+
+def test__1290_square():
+    q_z = square(Q1)
+    print("square: ", q_z)
+    assert q_z.t == -28
+    assert q_z.x == -4
+    assert q_z.y == -6
+    assert q_z.z == -8
+
+
+def test__1300_norm_squared():
+    q_z = norm_squared(Q1)
+    print("norm_squared: ", q_z)
+    assert q_z.t == 30
+    assert q_z.x == 0
+    assert q_z.y == 0
+    assert q_z.z == 0
+
+
+def test__1310_norm_squared_of_vector():
+    q_z = norm_squared_of_vector(Q1)
+    print("norm_squared_of_vector: ", q_z)
+    assert q_z.t == 29
+    assert q_z.x == 0
+    assert q_z.y == 0
+    assert q_z.z == 0
+
+
+def test__1320_abs_of_q():
+    q_z = abs_of_q(P)
+    print("abs_of_q: ", q_z)
+    assert q_z.t == 5
+    assert q_z.x == 0
+    assert q_z.y == 0
+    assert q_z.z == 0
+
+
+def test__1330_normalize():
+    q_z = normalize(P)
+    print("q_normalized: ", q_z)
+    assert q_z.t == 0
+    assert q_z.x == 0.8
+    assert math.isclose(q_z.y, -0.6)
+    assert q_z.z == 0
+
+
+def test__1340_abs_of_vector():
+    q_z = abs_of_vector(P)
+    print("abs_of_vector: ", q_z)
+    assert q_z.t == 5
+    assert q_z.x == 0
+    assert q_z.y == 0
+    assert q_z.z == 0
+
+
+def test__1350_add():
+    q_z = add(Q1, P)
+    print("add: ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == 2
+    assert q_z.y == -6
+    assert q_z.z == -4
+
+
+def test__1360_dif():
+    q_z = dif(Q1, P)
+    print("dif: ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == -6
+    assert q_z.y == 0
+    assert q_z.z == -4
+
+
+def test__1370_product():
+    q_z = product(Q1, P)
+    print("product: ", q_z)
+    assert q_z.t == -1
+    assert q_z.x == -8
+    assert q_z.y == -19
+    assert q_z.z == 18
+
+
+def test__1380_product_even():
+    q_z = product(Q1, P, kind="even")
+    print("product, kind even: ", q_z)
+    assert q_z.t == -1
+    assert q_z.x == 4
+    assert q_z.y == -3
+    assert q_z.z == 0
+
+
+def test__1390_product_odd():
+    q_z = product(Q1, P, kind="odd")
+    print("product, kind odd: ", q_z)
+    assert q_z.t == 0
+    assert q_z.x == -12
+    assert q_z.y == -16
+    assert q_z.z == 18
+
+
+def test__1400_product_even_minus_odd():
+    q_z = product(Q1, P, kind="even_minus_odd")
+    print("product, kind even_minus_odd: ", q_z)
+    assert q_z.t == -1
+    assert q_z.x == 16
+    assert q_z.y == 13
+    assert q_z.z == -18
+
+
+def test__1410_product_reverse():
+    q1q2_rev = product(Q1, P, reverse=True)
+    q2q1 = product(P, Q1)
+    assert equals(q1q2_rev, q2q1)
+
+
+def test__1430_inverse():
+    q_z = inverse(P)
+    print("inverse: ", q_z)
+    assert q_z.t == 0
+    assert q_z.x == -0.16
+    assert q_z.y == 0.12
+    assert q_z.z == 0
+
+
+def test__1440_divide_by():
+    q_z = divide_by(Q1, Q1)
+    print("divide_by: ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == 0
+    assert q_z.y == 0
+    assert q_z.z == 0
+
+
+def test__1450_triple_product():
+    q_z = triple_product(Q1, P, Q1)
+    print("triple product: ", q_z)
+    assert q_z.t == -2
+    assert q_z.x == 124
+    assert q_z.y == -84
+    assert q_z.z == 8
+
+
+def test__1460_rotate():
+    q_z = rotate(Q1, Q([0, 1, 0, 0]))
+    print("rotate: ", q_z)
+    assert q_z.t == 1
+    assert q_z.x == -2
+    assert q_z.y == 3
+    assert q_z.z == 4
+
+
+def test__1462_rotation_angle():
+    q_0 = q0()
+    q_i = qi()
+    q_j = qj()
+    q_ij = add(q_i, q_j)
+
+    assert rotation_angle(q_i, q_i, degrees=True).t == 0.0
+    assert math.isclose(rotation_angle(q_i, q_ij, degrees=True).t, 45.0)
+    assert rotation_angle(q_i, q_j, degrees=True).t == 90.0
+
+    # all 3 add up to 180
+    r123 = rotation_angle(q_i, q_ij, origin=q_0, degrees=True).t
+    r312 = rotation_angle(q_0, q_i, origin=q_ij, degrees=True).t
+    r231 = rotation_angle(q_ij, q_0, origin=q_i, degrees=True).t
+    assert math.isclose(r123 + r312 + r231, 180)
+
+def test__1470_rotation_and_or_boost():
+    q1_sq = square(Q1)
+    beta: float = 0.003
+    gamma = 1 / math.sqrt(1 - beta ** 2)
+    h = Q([gamma, gamma * beta, 0, 0])
+    q_z = rotation_and_or_boost(Q1, h)
+    q_z2 = square(q_z)
+    print("q1_sq: ", q1_sq)
+    print("boosted: ", q_z)
+    print("boosted squared: ", q_z2)
+    assert round(q_z2.t, 5) == round(q1_sq.t, 5)
+
+
+def test__1471_Lorentz_next_rotation():
+    with pytest.raises(ValueError):
+        Lorentz_next_rotation(Q1, q4321)
+    next_rotation = Lorentz_next_rotation(Q1, q1324)
+    print("next_rotation: ", next_rotation)
+    assert next_rotation.t == 0
+    rot = rotation_and_or_boost(q2244, next_rotation)
+    assert math.isclose(rot.t, 2)
+    assert math.isclose(square(rot).t, square(q2244).t)
+    next_rotation = Lorentz_next_rotation(Q1, Q1)
+    assert equals(next_rotation, normalize(vector_q(Q1)))
+
+
+def test__1472_Lorentz_next_boost():
+    with pytest.raises(ValueError):
+        Lorentz_next_boost(Q1, q4321)
+    next_boost = Lorentz_next_boost(Q1, q1324)
+    print(f"next_boost: {next_boost}")
+    assert next_boost.t != 0
+    boost = rotation_and_or_boost(q2244, next_boost)
+    assert math.isclose(square(boost).t, square(q2244).t)
+
+
+def test__1490_g_shift():
+    q1_sq = square(Q1)
+    q_z = g_shift(Q1, 0.003)
+    q_z2 = square(q_z)
+    q_z_minimal = g_shift(Q1, 0.003, g_form="minimal")
+    q_z2_minimal = square(q_z_minimal)
+    print("q1_sq: ", q1_sq)
+    print("g_shift: ", q_z)
+    print("g squared: ", q_z2)
+    assert q_z2.t != q1_sq.t
+    assert q_z2.x == q1_sq.x
+    assert q_z2.y == q1_sq.y
+    assert q_z2.z == q1_sq.z
+    assert q_z2_minimal.t != q1_sq.t
+    assert q_z2_minimal.x == q1_sq.x
+    assert q_z2_minimal.y == q1_sq.y
+    assert q_z2_minimal.z == q1_sq.z
+
+
+def test__1500_sin():
+    assert equals(sin(q0()), q0())
+    assert equals(sin(Q1), Q(
+        [
+            91.7837157840346691,
+            -21.8864868530291758,
+            -32.8297302795437673,
+            -43.7729737060583517,
+        ]
+    )
+    )
+    assert equals(sin(P), Q([0, 59.3625684622310033, -44.5219263466732542, 0]))
+    assert equals(sin(R), Q([0.1411200080598672, 0, 0, 0]))
+    assert equals(sin(C), Q([24.8313058489463785, -11.3566127112181743, 0, 0]))
+
+
+def test__1510_cos():
+    assert equals(cos(q0()), q1())
+    assert equals(cos(Q1), Q([
+        58.9336461679439481,
+        34.0861836904655959,
+        51.1292755356983974,
+        68.1723673809311919,
+    ]))
+    assert equals(cos(P), Q([74.2099485247878476, 0, 0, 0]))
+    assert equals(cos(R), Q([-0.9899924966004454, 0, 0, 0]))
+    assert equals(cos(C), Q([-11.3642347064010600, -24.8146514856341867, 0, 0]))
+
+
+def test__1520_tan():
+    assert equals(tan(q0()), q0())
+    assert equals(tan(Q1), Q([0.0000382163172501,
+                              -0.3713971716439372,
+                              -0.5570957574659058,
+                              -0.7427943432878743, ]))
+    assert equals(tan(P), Q([0, 0.7999273634100760, -0.5999455225575570, 0]))
+    assert equals(tan(R), Q([-0.1425465430742778, 0, 0, 0]))
+    assert equals(tan(C), Q([-0.0005079806234700, 1.0004385132020521, 0, 0]))
+
+
+def test__1530_sinh():
+    assert equals(sinh(q0()), q0())
+    assert equals(sinh(Q1),
+        Q(
+            [
+                0.7323376060463428,
+                0.4482074499805421,
+                0.6723111749708131,
+                0.8964148999610841,
+            ]
+        )
+    )
+    assert equals(sinh(P), Q([0, -0.7671394197305108, 0.5753545647978831, 0]))
+    assert equals(sinh(R), Q([10.0178749274099026, 0, 0, 0]))
+    assert equals(sinh(C), Q([-2.3706741693520015, -2.8472390868488278, 0, 0]))
+
+
+def test__1540_cosh():
+    assert equals(cosh(q0()), q1())
+    assert equals(cosh(Q1), Q(
+        [
+            0.9615851176369565,
+            0.3413521745610167,
+            0.5120282618415251,
+            0.6827043491220334,
+        ]
+    )
+    )
+    assert equals(cosh(P), Q([0.2836621854632263, 0, 0, 0]))
+    assert equals(cosh(R), Q([10.0676619957777653, 0, 0, 0]))
+    assert equals(cosh(C), Q([-2.4591352139173837, -2.7448170067921538, 0, 0]))
+
+
+def test__1550_tanh():
+    assert equals(tanh(q0()), q0())
+    assert equals(tanh(Q1),
+        Q(
+            [
+                1.0248695360556623,
+                0.1022956817887642,
+                0.1534435226831462,
+                0.2045913635775283,
+            ]
+        )
+    )
+    assert equals(tanh(P), Q([0, -2.7044120049972684, 2.0283090037479505, 0]))
+    assert equals(tanh(R), Q([0.9950547536867305, 0, 0, 0]))
+    assert equals(tanh(C), Q([1.0046823121902353, 0.0364233692474038, 0, 0]))
+
+
+def test__1560_exp():
+    assert equals(exp(q0()), q1())
+    assert equals(exp(Q1), Q(
+        [
+            1.6939227236832994,
+            0.7895596245415588,
+            1.1843394368123383,
+            1.5791192490831176,
+        ]
+    )
+    )
+    assert equals(exp(P), Q([0.2836621854632263, -0.7671394197305108, 0.5753545647978831, 0]))
+    assert equals(exp(R), Q([20.0855369231876679, 0, 0, 0]))
+    assert equals(exp(C), Q([-4.8298093832693851, -5.5920560936409816, 0, 0]))
+
+
+def test__1570_ln():
+    assert equals(exp(ln(Q1)), Q1)
+    assert equals(ln(Q1), Q(
+        [
+            1.7005986908310777,
+            -0.5151902926640850,
+            -0.7727854389961275,
+            -1.0303805853281700,
+        ]
+    )
+    )
+    assert equals(ln(P), Q([1.6094379124341003, 1.2566370614359172, -0.9424777960769379, 0]))
+    assert equals(ln(R), Q([1.0986122886681098, 0, 0, 0]))
+    assert equals(ln(C), Q([1.4978661367769954, 1.1071487177940904, 0, 0]))
+
+
+def test__1580_q_2_q():
+    assert equals(q_2_q(Q1, P), Q(
+        [
+            -0.0197219653530713,
+            -0.2613955437374326,
+            0.6496281248064009,
+            -0.3265786562423951,
+        ]
+    )
+    )
+
+
+Q12: Q = Q([1, 2, 0, 0])
+Q1123: Q = Q([1, 1, 2, 3])
+Q11p: Q = Q([1, 1, 0, 0], representation="polar")
+Q12p: Q = Q([1, 2, 0, 0], representation="polar")
+Q12np: Q = Q([1, -2, 0, 0], representation="polar")
+Q21p: Q = Q([2, 1, 0, 0], representation="polar")
+Q23p: Q = Q([2, 3, 0, 0], representation="polar")
+Q13p: Q = Q([1, 3, 0, 0], representation="polar")
+Q5p: Q = Q([5, 0, 0, 0], representation="polar")
+
+
+def test_txyz_2_representation():
+    qr = Q(Q12.txyz_2_representation(""))
+    assert equals(qr, Q12)
+    qr = Q(Q12.txyz_2_representation("polar"))
+    assert equals(qr, Q([2.23606797749979, 1.10714871779409, 0, 0]))
+    qr = Q(Q1123.txyz_2_representation("spherical"))
+    assert equals(qr, Q([1.0, 3.7416573867739413, 0.640522312679424, 1.10714871779409]))
+
+
+def test_representation_2_txyz():
+    qr = Q(Q12.representation_2_txyz(""))
+    assert equals(qr, Q12)
+    qr = Q(Q12.representation_2_txyz("polar"))
+    assert equals(qr, Q([-0.4161468365471424, 0.9092974268256817, 0, 0]))
+    qr = Q(Q1123.representation_2_txyz("spherical"))
+    assert equals(qr,
+        Q(
+            [
+                1.0,
+                -0.9001976297355174,
+                0.12832006020245673,
+                -0.4161468365471424,
+            ]
+        )
+    )
+
+
+def test_polar_products():
+    qr = product(Q11p, Q12p)
+    print("polar 1 1 0 0 * 1 2 0 0: ", qr)
+    assert equals(qr, Q13p)
+    qr = product(Q12p, Q21p)
+    print("polar 1 2 0 0 * 2 1 0 0: ", qr)
+    assert equals(qr, Q23p)
+
+
+def test_polar_conj():
+    qr = conj(Q12p)
+    print("polar conj of 1 2 0 0: ", qr)
+    assert equals(qr, Q12np)
+
+
+def test__1000_init():
+    assert q_0_q_1.dim == 2
+
+
+def test__1010_set_qs_type():
+    bk = b.set_qs_type("ket")
+    assert bk.rows == 3
+    assert bk.columns == 1
+    assert bk.qs_type == "ket"
+
+
+def test__1020_set_rows_and_columns():
+    assert q_i3.rows == 3
+    assert q_i3.columns == 1
+    assert q_i3_bra.rows == 1
+    assert q_i3_bra.columns == 3
+    assert q_i2d_op.rows == 2
+    assert q_i2d_op.columns == 2
+    assert q_6_op_32.rows == 3
+    assert q_6_op_32.columns == 2
+
+
+def test__1030_equals():
+    assert A.equals(A)
+    assert not A.equals(B)
+
+
+def test__1031_subs():
+    t, x, y, z = sp.symbols("t x y z")
+    q_sym = Qs([Q([t, x, y, x * y * z])])
+
+    q_z = q_sym.subs({t: 1, x: 2, y: 3, z: 4})
+    print("t x y xyz sub 1 2 3 4: ", q_z)
+    assert q_z.equals(Qs([Q([1, 2, 3, 24])]))
+
+
+def test__1032_scalar():
+    qs = q_1_q_i.scalar()
+    print("scalar(q_1_q_i)", qs)
+    assert qs.equals(q_1_q_0)
+
+
+def test__1033_vector():
+    qv = q_1_q_i.vector()
+    print("vector(q_1_q_i)", qv)
+    assert qv.equals(q_0_q_i)
+
+
+def test__1034_xyz():
+    qxyz = q_1_q_i.xyz()
+    print("q_1_q_i.xyz()", qxyz)
+    assert qxyz[0][0] == 0
+    assert qxyz[1][0] == 1
+
+
+def test__1035_q_0():
+    q0 = Qs().q_0(3)
+    print("q0(3): ", q0)
+    assert q0.dim == 3
+
+
+def test__1036_q1():
+    q_1 = Qs().q1(2.0, 3)
+    print("q1(3): ", q_1)
+    assert q_1.dim == 3
+    assert q_1.qs[0].t == 2.0
+
+
+def test__1037_qi():
+    q_i = Qs().qi(2.0, 3)
+    print("qi(3): ", q_i)
+    assert q_i.dim == 3
+    assert q_i.qs[0].x == 2.0
+
+
+def test__1038_qj():
+    qj = Qs().qj(2.0, 3)
+    print("qj(3): ", qj)
+    assert qj.dim == 3
+    assert qj.qs[0].y == 2.0
+
+
+def test__1039_qk():
+    q_k = Qs().qk(2.0, 3)
+    print("qk(3): ", q_k)
+    assert q_k.dim == 3
+    assert q_k.qs[0].z == 2.0
+
+
+def test__1039_qrandom():
+    qr = Qs().qrandom(-2, 2, dim=3)
+    print("qk(3): ", qr)
+    assert qr.dim == 3
+    assert qr.qs[0].z != qr.qs[0].t
+
+
+def test__1040_conj():
+    qc = q_1_q_i.conj()
+    qc1 = q_1_q_i.conj(1)
+    print("q_1_q_i*: ", qc)
+    print("q_1_qc*1: ", qc1)
+    assert qc.qs[1].x == -1
+    assert qc1.qs[1].x == 1
+
+
+def test__1042_conj_q():
+    qc = q_1_q_i.conj_q(q_1)
+    qc1 = q_1_q_i.conj_q(q_1)
+    print("q_1_q_i conj_q: ", qc)
+    print("q_1_qc*1 conj_q: ", qc1)
+    assert qc.qs[1].x == -1
+    assert qc1.qs[1].x == -1
+
+
+def test__1050_flip_signs():
+    qf = q_1_q_i.flip_signs()
+    print("-q_1_q_i: ", qf)
+    assert qf.qs[1].x == -1
+
+
+def test__1060_inverse():
+    inv_v1123 = v1123.inverse()
+    print("inv_v1123 operator", inv_v1123)
+    vvinv = inv_v1123.product(v1123)
+    vvinv.print_state("vinvD x v")
+    assert vvinv.equals(q14)
+
+    inv_v33 = v33.inverse()
+    print("inv_v33 operator", inv_v33)
+    vv33 = inv_v33.product(v33)
+    vv33.print_state("inv_v33D x v33")
+    assert vv33.equals(q19)
+
+    Ainv = A.inverse()
+    print("A ket inverse, ", Ainv)
+    AAinv = A.product(Ainv)
+    AAinv.print_state("A x AinvD")
+    assert AAinv.equals(q12)
+
+
+def test__1070_normalize():
+    qn_test = qn.normalize()
+    print("Op normalized: ", qn_test)
+    assert math.isclose(qn_test.qs[0].t, 0.6)
+    assert qn_test.qs[0].z == 0.8
+
+
+def test__1080_determinant():
+    det_v3 = v3.determinant()
+    assert det_v3.equals(v3)
+    v1123: Qs = Qs([q_1, q_1, q_2, q_3])
+    det_v1123 = v1123.determinant()
+    print("det v1123", det_v1123)
+    assert det_v1123.equals(Qs([q_1]))
+    v9.print_state("v9")
+    det_v9 = v9.determinant()
+    print("det_v9", det_v9)
+    assert det_v9.equals(Qs([q_9]))
+    det_vv9 = vv9.determinant()
+    print("det_vv9", det_vv9)
+    assert det_vv9.equals(Qs([qn627]))
+
+
+def test__1090_summation():
+    q_01_sum = q_0_q_1.summation()
+    print("sum: ", q_01_sum)
+    assert type(q_01_sum) is Qs
+    assert q_01_sum.qs[0].t == 1
+
+
+def test__1100_add():
+    q_0110_add = q_0_q_1.add(q_1_q_0)
+    print("add 01 10: ", q_0110_add)
+    assert q_0110_add.qs[0].t == 1
+    assert q_0110_add.qs[1].t == 1
+
+
+def test__1110_dif():
+    q_0110_dif = q_0_q_1.dif(q_1_q_0)
+    print("dif 01 10: ", q_0110_dif)
+    assert q_0110_dif.qs[0].t == -1
+    assert q_0110_dif.qs[1].t == 1
+
+
+def test__1120_diagonal():
+    Op4iDiag2 = Op_scalar.diagonal(2)
+    print("Op4i on a diagonal 2x2", Op4iDiag2)
+    assert equals(Op4iDiag2.qs[0], q_i4)
+    assert equals(Op4iDiag2.qs[1], q0())
+
+
+def test__1125_trace():
+    trace = v1123.op(2, 2).trace()
+    print("trace: ", trace)
+    assert trace.equals(Qs([q_4]))
+
+
+def test__1130_identity():
+    I2 = Qs().identity(2, operator=True)
+    print("Operator Identity, diagonal 2x2", I2)
+    assert equals(I2.qs[0], q1())
+    assert equals(I2.qs[1], q0())
+    I2 = Qs().identity(2)
+    print("Identity on 2 state ket", I2)
+    assert equals(I2.qs[0], q1())
+    assert equals(I2.qs[1], q1())
+
+
+def test__1140_product():
+    assert b.product(o).equals(Qs([Q([10, 0, 0, 0]), Q([20, 0, 0, 0]), Q([30, 0, 0, 0])]))
+    assert b.product(k).equals(Qs([Q([32, 0, 0, 0])]))
+    assert b.product(o).product(k).equals(Qs([Q([320, 0, 0, 0])]))
+    assert b.product(b).equals(Qs([Q([1, 0, 0, 0]), Q([4, 0, 0, 0]), Q([9, 0, 0, 0])]))
+    assert o.product(k).equals(Qs([Q([40, 0, 0, 0]), Q([50, 0, 0, 0]), Q([60, 0, 0, 0])]))
+    assert o.product(o).equals(Qs([Q([100, 0, 0, 0])]))
+    assert k.product(k).equals(Qs([Q([16, 0, 0, 0]), Q([25, 0, 0, 0]), Q([36, 0, 0, 0])]))
+    assert k.product(b).equals(Qs(
+        [
+            Q([4, 0, 0, 0]),
+            Q([5, 0, 0, 0]),
+            Q([6, 0, 0, 0]),
+            Q([8, 0, 0, 0]),
+            Q([10, 0, 0, 0]),
+            Q([12, 0, 0, 0]),
+            Q([12, 0, 0, 0]),
+            Q([15, 0, 0, 0]),
+            Q([18, 0, 0, 0]),
+        ]
+    )
+    )
+
+
+def test__1150_product_AA():
+    Aket = deepcopy(A).ket()
+    AA = A.product(Aket)
+    print("<A|A>: ", AA)
+    assert AA.equals(Qs([Q([17, 0, 0, 0])]))
+
+
+def test__1170_product_AOp():
+    AOp: Qs = A.product(Op)
+    print("A Op: ", AOp)
+    assert equals(AOp.qs[0], Q([11, 0, 0, 0]))
+    assert equals(AOp.qs[1], Q([0, 0, 5, 0]))
+    assert equals(AOp.qs[2], Q([4, 0, 0, 0]))
+
+
+def test__1190_product_AOp4i():
+    AOp4i: Qs = A.product(Op4i)
+    print("A Op4i: ", AOp4i)
+    assert equals(AOp4i.qs[0], Q([0, 16, 0, 0]))
+    assert equals(AOp4i.qs[1], Q([-4, 0, 0, 0]))
+
+
+def test__1210_product_OpB():
+    OpB: Qs = Op.product(B)
+    print("Op B: ", OpB)
+    assert equals(OpB.qs[0], Q([0, 10, 3, 0]))
+    assert equals(OpB.qs[1], Q([-18, 0, 0, 1]))
+
+
+def test__1230_product_AOpB():
+    AOpB = A.product(Op).product(B)
+    print("A Op B: ", AOpB)
+    assert AOpB.equals(Qs([Q([0, 22, 11, 0])]))
+
+
+def test__1250_product_AOp4i():
+    AOp4i = A.product(Op4i)
+    print("A Op4i: ", AOp4i)
+    assert equals(AOp4i.qs[0], Q([0, 16, 0, 0]))
+    assert equals(AOp4i.qs[1], Q([-4, 0, 0, 0]))
+
+
+def test__1270_product_Op4iB():
+    Op4iB = Op4i.product(B)
+    print("Op4i B: ", Op4iB)
+    assert equals(Op4iB.qs[0], Q([0, 6, 0, 4]))
+    assert equals(Op4iB.qs[1], Q([0, 9, -8, 0]))
+
+
+def test__1290_product_AOp4iB():
+    AOp4iB = A.product(Op4i).product(B)
+    print("A* Op4i B: ", AOp4iB)
+    assert AOp4iB.equals(Qs([Q([-9, 24, 0, 8])]))
+
+
+def test__1430_inverse():
+    q_z = P_states.inverse()
+    print("inverse: ", q_z)
+    assert q_z.equals(Qs([Q([0, -0.16, 0.12, 0])]))
+
+
+def test__1301_divide_by():
+    q_z = Q_states.divide_by(Q_states)
+    print("divide_by: ", q_z)
+    assert q_z.equals(Qs([q_1]))
+
+
+def test__1302_triple_product():
+    q_z = Q_states.triple_product(P_states, Q_states)
+    print("triple product: ", q_z)
+    assert q_z.equals(Qs([Q([-2, 124, -84, 8])]))
+
+
+def test__1303_rotate():
+    q_z = Q_states.rotate(Qs([q_i]))
+    print("rotate: ", q_z)
+    assert q_z.equals(Qs([Q([1, -2, 3, 4])]))
+
+
+def test__1304_rotation_and_or_boost():
+    q1_sq = Q_states.square()
+    beta = 0.003
+    gamma = 1 / math.sqrt(1 - beta ** 2)
+    h = Qs([Q([gamma, gamma * beta, 0, 0])])
+    q_z = Q_states.rotation_and_or_boost(h)
+    q_z2 = q_z.square()
+    print("q1_sq: ", q1_sq)
+    print("boosted: ", q_z)
+    print("boosted squared: ", q_z2)
+    assert round(q_z2.qs[0].t, 5) == round(q1_sq.qs[0].t, 5)
+
+
+def test__1305_Lorentz_next_rotation():
+    with pytest.raises(ValueError):
+        Qs.Lorentz_next_rotation(qs_1234, q2_states)
+    next_rot: Qs = Qs.Lorentz_next_rotation(qs_1234, qs_1324)
+    print("next_rotation: ", next_rot)
+    assert math.isclose(next_rot.qs[0].t, 0)
+    assert math.isclose(next_rot.qs[1].t, 0)
+    assert math.isclose(next_rot.norm_squared().qs[0].t, 2)
+    assert not equals(next_rot.qs[0], next_rot.qs[1])
+
+
+def test__1305_Lorentz_next_boost():
+    with pytest.raises(ValueError):
+        Qs.Lorentz_next_boost(qs_1234, q2_states)
+    next_boost: Qs = Qs.Lorentz_next_boost(qs_1234, qs_1324)
+    print("next_boost: ", next_boost)
+    assert next_boost.qs[0].t != 0
+    assert next_boost.qs[1].t != 0
+    assert next_boost.norm_squared().qs[0].t != 1
+    assert not equals(next_boost.qs[0], next_boost.qs[1])
+    boosted_square = q2_states.rotation_and_or_boost(next_boost).square()
+    q2_states_square = q2_states.square()
+    assert math.isclose(q2_states_square.qs[0].t, boosted_square.qs[0].t)
+
+
+def test__1306_g_shift():
+    qs1_sq = Q_states.square()
+    qs_z = Q_states.g_shift(0.003)
+    qs_z2 = qs_z.square()
+    qs_z_minimal = Q_states.g_shift(0.003, g_form="minimal")
+    qs_z2_minimal = qs_z_minimal.square()
+    print("q1_sq: ", qs1_sq)
+    print("g_shift: ", qs_z)
+    print("g squared: ", qs_z2)
+    assert qs_z2.qs[0].t != qs1_sq.qs[0].t
+    assert qs_z2.qs[0].x == qs1_sq.qs[0].x
+    assert qs_z2.qs[0].y == qs1_sq.qs[0].y
+    assert qs_z2.qs[0].z == qs1_sq.qs[0].z
+    assert qs_z2_minimal.qs[0].t != qs1_sq.qs[0].t
+    assert qs_z2_minimal.qs[0].x == qs1_sq.qs[0].x
+    assert qs_z2_minimal.qs[0].y == qs1_sq.qs[0].y
+    assert qs_z2_minimal.qs[0].z == qs1_sq.qs[0].z
+
+
+def test__1305_bracket():
+    bracket1234 = Qs().bracket(
+        q_1234, Qs().identity(4, operator=True), q_1234
+    )
+    print("bracket <1234|I|1234>: ", bracket1234)
+    assert bracket1234.equals(Qs([Q([34, 0, 0, 0])]))
+
+
+def test__1310_op_q():
+    opn = Op.op_q(q=q_i)
+    print("op_q: ", opn)
+    assert opn.qs[0].x == 3
+
+
+def test__1312_square():
+    ns = q_1_q_i.square()
+    ns.print_state("q_1_q_i square")
+    assert ns.equals(Qs([q_1, q_n1]))
+
+
+def test__1315_norm_squared():
+    ns = q_1_q_i.norm_squared()
+    ns.print_state("q_1_q_i norm squared")
+    assert ns.equals(Qs([Q([2, 0, 0, 0])]))
+
+
+def test__1318_norm_squared_of_vector():
+    ns = q_1_q_i.norm_squared_of_vector()
+    ns.print_state("q_1_q_i norm squared of vector")
+    assert ns.equals(Qs([q_1]))
+
+
+def test__1320_transpose():
+    opt = q_1234.transpose()
+    print("op1234 transposed: ", opt)
+    assert opt.qs[0].t == 1
+    assert opt.qs[1].t == 3
+    assert opt.qs[2].t == 2
+    assert opt.qs[3].t == 4
+    optt = q_1234.transpose().transpose()
+    assert optt.equals(q_1234)
+
+
+def test__1330_Hermitian_conj():
+    q_hc = q_1234.Hermitian_conj()
+    print("op1234 Hermtian_conj: ", q_hc)
+    assert q_hc.qs[0].t == 1
+    assert q_hc.qs[1].t == 3
+    assert q_hc.qs[2].t == 2
+    assert q_hc.qs[3].t == 4
+    assert q_hc.qs[0].x == -1
+    assert q_hc.qs[1].x == -1
+    assert q_hc.qs[2].x == -1
+    assert q_hc.qs[3].x == -1
+
+
+def test__1340_is_Hermitian():
+    assert sigma_y.is_Hermitian()
+    assert not q_1234.is_Hermitian()
+
+
+def test__1350_is_square():
+    assert not Op.is_square()
+    assert Op_scalar.is_square()
