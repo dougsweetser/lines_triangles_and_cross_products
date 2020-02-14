@@ -165,16 +165,26 @@ together, it is the odd part of the product: """)
 
 st.latex("A B = (A B + B A)/2 + (A B - B A)/2 = Even(A B) + Odd(A B)")
 
+st.markdown("Written in component form:")
+
+st.latex("Even(A, B) = (A0 B0 - (A1 B1 + A2 B2 + A3 B3), A0 B1 + A1 B0, A0 B2 + A2 B0, A0 B3 + A3 B0)")
+
+st.latex("Odd(A, B) = (0, A2 B3 - A3 B2, A1 B3 - A3 B1, A1 B2 - A2 B1")
+
 st.markdown("""The quaternions cross product is the odd term. This is not the
 standard definition of a Gibbs cross product because there is no notion of the
 Even() product which happens to be a combination of the difference of a scalar
 times a scalar and vector dot product summed with scalars times vectors
 (translation: an abomination to those schooled in vector algebra).
 
+The Gibbs definition of the cross product is the component one without the
+zero. Anything one can prove with a Gibbs cross product can be redone using
+the quaternion cross product and its zero tag-along.
+
 If one just focuses on the quaternion cross product, the scalar term is always
 necessarily equal to zero. Why care about the difference between zero and
 undefined as with the Gibb's cross product? One can at least try to think
-about zero unlike something undefined.
+about zero unlike something that is formally undefined.
 
 In the literture on 3D rotations, the fourth factor is sometimes called "w", 
 perhaps a shorthand for what-the-f. As someone who want physics to shape my
@@ -183,6 +193,18 @@ three imaginaries as space. One quaternion represents one event in space-time,
 happening now. The cross product can be used to characterize 3 events-now. If
 the three events-now are in a line, then the cross product is zero. If the three
 events-now are not colinear, then the cross product will not be zero.
+
+Each symmetric or even term involves time. If time gets reversed, the movie
+plays backwards but otherwise looks the same. Each anti-symmetric or odd term
+is exclusively about space. Spatial reflections use mirrors.
+
+One recent insight is that one quaternion cannot tell a story. Only collections
+of quaternions can tell stories. I associate cross products and curls with 
+systems changing: a spinning bicycle wheel or a moving eletric field creating
+a magnetic field. Each dynamic system is a collection of events, each frame
+of the dynamic system happening at time now. The cross product may change
+during a succession of nows, from close to being a line to being farther apart.
+I look forward to trying to develop analytic animations of such changes.
 
 The angles reported are the same as one expects to see from basic geometry. The
 angles sum up to 180 for a flat space-time. I added a curvature slider that
